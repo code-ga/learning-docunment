@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình khám phá Định lý Menelaus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral (Stone) + Blue Accent -->
+    <!-- Application Structure Plan: Cấu trúc SPA dựa trên tab để chia nhỏ nội dung học thuật phức tạp. Người dùng điều hướng qua các tab: "Giới thiệu", "Minh họa", "Chứng minh 1", "Chứng minh 2", và "Nâng cao". Luồng này cho phép người dùng chọn mức độ chi tiết họ muốn khám phá, từ công thức cơ bản đến các chứng minh chi tiết hoặc các khái niệm nâng cao. Tương tác chính là chuyển đổi tab (JS show/hide) và các nút để thay đổi sơ đồ canvas động. Cấu trúc này được chọn vì nó biến một tài liệu tuyến tính, dày đặc thành một trải nghiệm học tập theo mô-đun, tương tác, giúp tiêu thụ thông tin dễ dàng hơn. -->
+    <!-- Visualization & Content Choices:
+        - Thông tin: Phát biểu định lý & công thức. Goal: Thông báo. Trình bày: Văn bản + Công thức MathJax được định dạng chính xác. Tương tác: Không. Lý do: Trình bày rõ ràng công thức cốt lõi. Phương pháp: HTML + MathJax.
+        - Thông tin: 2 trường hợp của cát tuyến (cắt 2 cạnh, cắt 0 cạnh). Goal: Hình dung. Trình bày: Sơ đồ Canvas. Tương tác: Các nút ("Trường hợp 1", "Trường hợp 2") kích hoạt JS để vẽ lại canvas. Lý do: Trực quan hóa một khái niệm trừu tượng, làm rõ "Lưu ý quan trọng" trong báo cáo. Phương pháp: Canvas API + JS. (Không dùng Chart.js vì đây là sơ đồ hình học, không phải biểu đồ dữ liệu).
+        - Thông tin: Hai phương pháp chứng minh. Goal: Tổ chức/Giải thích. Trình bày: Văn bản từng bước trong các tab riêng biệt ("Chứng minh 1", "Chứng minh 2"). Mỗi tab chứa sơ đồ canvas chuyên dụng cho phương pháp đó. Tương tác: Điều hướng tab. Lý do: Tách biệt các luồng logic phức tạp để tránh choáng ngợp. Phương pháp: HTML/JS + Canvas API.
+        - Thông tin: Định lý đảo & Tỉ lệ đại số. Goal: Thông báo (Nâng cao). Trình bày: Văn bản trong tab "Nâng cao". Lý do: Tách biệt nội dung nâng cao khỏi các khái niệm cốt lõi. Phương pháp: HTML.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; 
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-btn {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #57534e; 
+        }
+        .tab-btn.active {
+            border-color: #3b82f6; 
+            color: #2563eb; 
+        }
+        .math-formula {
+            background-color: #fafaf9; 
+            border: 1px solid #e7e5e4; 
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1c1917; 
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e7e5e4;
+            padding-bottom: 0.5rem;
+        }
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #44403c; 
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        p, li {
+            line-height: 1.6;
+            color: #44403c; 
+            margin-bottom: 1rem;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+        }
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        canvas {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            border: 1px solid #e7e5e4;
+        }
+    </style>
+</head>
+<body class="text-stone-900">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-center text-blue-700 mb-2">Trình khám phá Định lý Menelaus</h1>
+            <p class="text-center text-lg text-stone-600">Một công cụ tương tác để hiểu định lý, các chứng minh và ứng dụng.</p>
+        </header>
+
+        <main class="bg-white shadow-xl rounded-lg p-6 md:p-10">
+            
+            <nav class="flex flex-wrap border-b border-stone-300 mb-6 -mt-6 -mx-10 px-6">
+                <button class="tab-btn active" data-tab="intro">Giới thiệu & Công thức</button>
+                <button class="tab-btn" data-tab="visual">Minh họa Tương tác</button>
+                <button class="tab-btn" data-tab="proof1">Chứng minh 1: Đường vuông góc</button>
+                <button class="tab-btn" data-tab="proof2">Chứng minh 2: Đường song song</button>
+                <button class="tab-btn" data-tab="advanced">Nâng cao</button>
+            </nav>
+
+            <div id="intro-content" class="tab-content active">
+                <h2>1. Phát biểu Định lý (Phần thuận)</h2>
+                <p>Định lý Menelaus là một định lý cơ bản trong hình học Euclid, được đặt theo tên nhà toán học Hy Lạp Menelaus của Alexandria (khoảng năm 100 SCN). Định lý này thiết lập một mối quan hệ giữa các tỉ lệ độ dài khi một đường thẳng cắt qua các cạnh của một tam giác.</p>
+                <p>Cho một tam giác $\triangle ABC$. Lấy ba điểm $D, E, F$ lần lượt nằm trên các đường thẳng chứa các cạnh $BC, CA, AB$ của tam giác (sao cho $D, E, F$ không trùng với các đỉnh $A, B, C$).</p>
+                <p>Khi đó, ba điểm $D, E, F$ thẳng hàng khi và chỉ khi:</p>
+                
+                <div class="math-formula">
+                    $$ \frac{AF}{FB} \cdot \frac{BD}{DC} \cdot \frac{CE}{EA} = 1 $$
+                </div>
+                <p class="mt-4 italic text-stone-600">*(Trong đó, $AF, FB, BD, DC, CE, EA$ là độ dài của các đoạn thẳng tương ứng)*</p>
+
+                <h3>Lưu ý quan trọng</h3>
+                <ul class="list-disc pl-5 text-stone-600 space-y-2">
+                    <li>Một đường thẳng (gọi là cát tuyến) cắt một tam giác sẽ phải cắt <strong>hoặc là 2 cạnh</strong> (và 1 phần kéo dài của cạnh thứ 3) <strong>hoặc là 0 cạnh</strong> (cắt cả 3 đường thẳng chứa cạnh ở phần kéo dài).</li>
+                    <li>Công thức trên sử dụng <strong>độ dài đoạn thẳng</strong> (luôn dương).</li>
+                </ul>
+                <p class="mt-4">Hãy chuyển sang tab "Minh họa Tương tác" để xem trực quan hai trường hợp này!</p>
+            </div>
+
+            <div id="visual-content" class="tab-content">
+                <h2>Minh họa Tương tác</h2>
+                <p>Sử dụng các nút bên dưới để chuyển đổi giữa hai trường hợp cơ bản mà cát tuyến $DEF$ có thể cắt $\triangle ABC$. Sơ đồ này sẽ vẽ lại để minh họa cho từng kịch bản.</p>
+                
+                <div class="flex justify-center space-x-4 my-4">
+                    <button id="case1-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition">Trường hợp 1 (Cắt 2 cạnh)</button>
+                    <button id="case2-btn" class="bg-stone-500 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-stone-600 transition">Trường hợp 2 (Cắt 0 cạnh)</button>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="menelaus-canvas"></canvas>
+                </div>
+                <p id="diagram-caption" class="text-center italic text-stone-600 mt-2 font-semibold"></p>
+            </div>
+
+            <div id="proof1-content" class="tab-content">
+                <h2>2.1. Chứng minh bằng đường vuông góc (Cách 1)</h2>
+                <p><strong>Phương pháp:</strong> Sử dụng định lý Thales (hoặc tam giác đồng dạng) bằng cách kẻ các đường vuông góc từ các đỉnh của tam giác xuống đường thẳng cát tuyến.</p>
+                
+                <div class="canvas-container" style="height: 350px;">
+                    <canvas id="proof1-canvas"></canvas>
+                </div>
+
+                <h3>Các bước chứng minh:</h3>
+                <ol class="list-decimal pl-5 space-y-3">
+                    <li>Giả sử $D, E, F$ là ba điểm thẳng hàng trên một đường thẳng $d$.</li>
+                    <li>Từ ba đỉnh $A, B, C$ của tam giác, ta kẻ các đường vuông góc $AH, BI, CK$ xuống đường thẳng $d$ (với $H, I, K$ thuộc $d$).</li>
+                    <li>Do $AH, BI, CK$ đều vuông góc với $d$ nên chúng song song với nhau ($AH \parallel BI \parallel CK$).</li>
+                    <li>Áp dụng định lý Thales (hoặc xét các cặp tam giác vuông đồng dạng) ta có các tỉ lệ sau:
+                        <ul class="list-disc pl-6 my-2 space-y-2">
+                            <li>Xét $\triangle FHA \sim \triangle FIB$ (hoặc Thales cho $BI \parallel AH$):
+                                <div class="math-formula text-sm">$$ \frac{AF}{FB} = \frac{AH}{BI} \quad (1) $$</div>
+                            </li>
+                            <li>Xét $\triangle DIB \sim \triangle DKC$ (hoặc Thales cho $BI \parallel CK$):
+                                <div class="math-formula text-sm">$$ \frac{BD}{DC} = \frac{BI}{CK} \quad (2) $$</div>
+                            </li>
+                            <li>Xét $\triangle EKC \sim \triangle EHA$ (hoặc Thales cho $CK \parallel AH$):
+                                <div class="math-formula text-sm">$$ \frac{CE}{EA} = \frac{CK}{AH} \quad (3) $$</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>Nhân vế theo vế của ba tỉ lệ thức (1), (2), và (3), ta được:
+                        <div class="math-formula">$$ \left( \frac{AF}{FB} \right) \cdot \left( \frac{BD}{DC} \right) \cdot \left( \frac{CE}{EA} \right) = \left( \frac{AH}{BI} \right) \cdot \left( \frac{BI}{CK} \right) \cdot \left( \frac{CK}{AH} \right) $$</div>
+                    </li>
+                    <li>Rút gọn vế bên phải, ta thấy các độ dài $AH, BI, CK$ đều bị triệt tiêu:
+                        <div class="math-formula">$$ \frac{AF}{FB} \cdot \frac{BD}{DC} \cdot \frac{CE}{EA} = 1 $$</div>
+                    </li>
+                    <li>Đây chính là điều phải chứng minh.</li>
+                </ol>
+            </div>
+
+            <div id="proof2-content" class="tab-content">
+                <h2>2.2. Chứng minh bằng đường song song (Cách 2)</h2>
+                <p>Phương pháp này dựa trên việc kẻ một đường phụ song song để áp dụng định lý Thales (hoặc tam giác đồng dạng).</p>
+                
+                <div class="canvas-container" style="height: 320px;">
+                    <canvas id="proof2-canvas"></canvas>
+                </div>
+
+                <h3>Các bước phân tích:</h3>
+                
+                <h4>Bước 1: Phân tích bài toán</h4>
+                <ul class="list-disc pl-5">
+                    <li><strong>Mục tiêu:</strong> Chứng minh $\frac{AF}{FB} \cdot \frac{BD}{DC} \cdot \frac{CE}{EA} = 1$.</li>
+                    <li><strong>Công cụ:</strong> Định lý Thales hoặc tam giác đồng dạng.</li>
+                    <li><strong>Vấn đề:</strong> Không có sẵn các đường song song.</li>
+                    <li><strong>Giải pháp:</strong> Kẻ thêm một đường phụ song song.</li>
+                </ul>
+
+                <h4>Bước 2: Chọn đường kẻ song song</h4>
+                 <ul class="list-disc pl-5">
+                    <li><strong>Lựa chọn tối ưu:</strong> Kẻ một đường thẳng từ đỉnh $C$ sao cho nó <strong>song song với cạnh $AB$</strong>.</li>
+                    <li><strong>Dựng hình:</strong> Gọi đường thẳng này là $d'$. Đường thẳng $d'$ cắt cát tuyến $DEF$ tại một điểm (ta gọi là $G$).</li>
+                    <li><strong>Kết quả:</strong> Ta có $CG \parallel AB$ (đồng nghĩa với $CG \parallel FB$ và $CG \parallel AF$).</li>
+                </ul>
+
+                <h4>Bước 3: Suy ra các tỉ lệ</h4>
+                <p>Ta có hai cặp tam giác đồng dạng kiểu "đồng hồ cát":</p>
+                <ul class="list-disc pl-5">
+                    <li><strong>Cặp 1: Xét $CG \parallel AF$</strong>
+                        <p>$\triangle AFE \sim \triangle CGE$ (g.g) $\Rightarrow$ 
+                        <div class="math-formula text-sm">$$ \frac{AF}{CG} = \frac{EA}{CE} \quad (a) $$</div>
+                    </p>
+                    </li>
+                    <li><strong>Cặp 2: Xét $CG \parallel FB$</strong>
+                        <p>$\triangle BFD \sim \triangle CGD$ (g.g) $\Rightarrow$
+                        <div class="math-formula text-sm">$$ \frac{FB}{CG} = \frac{BD}{DC} \quad (b) $$</div>
+                    </p>
+                    </li>
+                </ul>
+
+                <h4>Bước 4: Tổng hợp kết quả</h4>
+                <p>Chia vế theo vế của (a) cho (b):</p>
+                <div class="math-formula">$$ \frac{\left( \frac{AF}{CG} \right)}{\left( \frac{FB}{CG} \right)} = \frac{\left( \frac{EA}{CE} \right)}{\left( \frac{BD}{DC} \right)} $$</div>
+                <p>Rút gọn $CG$ ở vế trái:</p>
+                <div class="math-formula">$$ \frac{AF}{FB} = \frac{EA}{CE} \cdot \frac{DC}{BD} $$</div>
+                <p>Nhân chéo và sắp xếp lại, ta có (điều phải chứng minh):</p>
+                <div class="math-formula">$$ \frac{AF}{FB} \cdot \frac{BD}{DC} \cdot \frac{CE}{EA} = 1 $$</div>
+            </div>
+
+            <div id="advanced-content" class="tab-content">
+                <h2>3. Định lý đảo (Phần đảo)</h2>
+                <p>Ngược lại, nếu ba điểm $D, E, F$ lần lượt nằm trên các đường thẳng $BC, CA, AB$ và thỏa mãn hệ thức:</p>
+                <div class="math-formula">$$ \frac{AF}{FB} \cdot \frac{BD}{DC} \cdot \frac{CE}{EA} = 1 $$</div>
+                <p>...thì ba điểm $D, E, F$ <strong>thẳng hàng</strong>.</p>
+                <p class="font-semibold text-blue-600">Phần đảo của định lý này rất hữu ích và thường được sử dụng để chứng minh ba điểm thẳng hàng.</p>
+
+                <h3 class="mt-6">Lưu ý về Tỉ lệ Đại số (Có dấu)</h3>
+                <p>Định lý Menelaus cũng thường được phát biểu dưới dạng tỉ lệ đại số (có dấu) để tăng tính chính xác, đặc biệt là cho định lý đảo.</p>
+                <div class="math-formula">$$ \frac{\vec{AF}}{\vec{FB}} \cdot \frac{\vec{BD}}{\vec{DC}} \cdot \frac{\vec{CE}}{\vec{EA}} = -1 $$</div>
+                <p>Trong đó, tỉ lệ $\frac{\vec{AF}}{\vec{FB}}$ được hiểu là tỉ lệ đại số. Tỉ lệ này sẽ <strong>âm (-)</strong> nếu $F$ nằm <strong>ngoài</strong> đoạn $AB$ và <strong>dương (+)</strong> nếu $F$ nằm <strong>trong</strong> đoạn $AB$.</p>
+                
+                <div class="grid md:grid-cols-2 gap-4 mt-4">
+                    <div class="bg-stone-50 p-4 rounded-lg border border-stone-200">
+                        <h4 class="font-semibold">Trường hợp 1: Cắt 2 cạnh (trong) và 1 phần kéo dài (ngoài)</h4>
+                        <ul class="list-disc pl-5">
+                            <li>$AF/FB > 0$ (trong)</li>
+                            <li>$CE/EA > 0$ (trong)</li>
+                            <li>$BD/DC < 0$ (ngoài)</li>
+                        </ul>
+                        <p class="font-semibold mt-2">Tích: $(+) \cdot (+) \cdot (-) = -1$</p>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-lg border border-stone-200">
+                        <h4 class="font-semibold">Trường hợp 2: Cắt 3 phần kéo dài (ngoài)</h4>
+                        <ul class="list-disc pl-5">
+                            <li>$AF/FB < 0$ (ngoài)</li>
+                            <li>$BD/DC < 0$ (ngoài)</li>
+                            <li>$CE/EA < 0$ (ngoài)</li>
+                        </ul>
+                        <p class="font-semibold mt-2">Tích: $(-) \cdot (-) \cdot (-) = -1$</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(item => item.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    const targetId = tab.dataset.tab;
+                    contents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${targetId}-content`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            const case1Btn = document.getElementById('case1-btn');
+            const case2Btn = document.getElementById('case2-btn');
+            const caption = document.getElementById('diagram-caption');
+            const mainCanvas = document.getElementById('menelaus-canvas');
+            const proof1Canvas = document.getElementById('proof1-canvas');
+            const proof2Canvas = document.getElementById('proof2-canvas');
+
+            const drawLabel = (ctx, text, x, y, color = '#1c1917', font = '16px Inter') => {
+                ctx.fillStyle = color;
+                ctx.font = font;
+                ctx.fillText(text, x, y);
+            };
+
+            const drawPoint = (ctx, x, y, label, color = '#dc2626') => {
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.fillStyle = color;
+                ctx.fill();
+                drawLabel(ctx, label, x + 8, y + 5);
+            };
+
+            const drawLine = (ctx, x1, y1, x2, y2, color = '#78716c', width = 1) => {
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = width;
+                ctx.stroke();
+            };
+
+            const drawDashedLine = (ctx, x1, y1, x2, y2, color = '#a8a29e', width = 1) => {
+                ctx.beginPath();
+                ctx.setLineDash([5, 5]);
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = width;
+                ctx.stroke();
+                ctx.setLineDash([]);
+            };
+
+            const drawMainDiagram = (caseType) => {
+                if (!mainCanvas) return;
+                const ctx = mainCanvas.getContext('2d');
+                const w = mainCanvas.width = mainCanvas.clientWidth;
+                const h = mainCanvas.height = mainCanvas.clientHeight;
+                ctx.clearRect(0, 0, w, h);
+
+                const A = { x: w * 0.5, y: h * 0.15 };
+                const B = { x: w * 0.2, y: h * 0.8 };
+                const C = { x: w * 0.8, y: h * 0.8 };
+
+                drawLine(ctx, A.x, A.y, B.x, B.y, '#1c1917', 2);
+                drawLine(ctx, B.x, B.y, C.x, C.y, '#1c1917', 2);
+                drawLine(ctx, C.x, C.y, A.x, A.y, '#1c1917', 2);
+                
+                drawPoint(ctx, A.x, A.y, 'A', '#1c1917');
+                drawPoint(ctx, B.x, B.y, 'B', '#1c1917');
+                drawPoint(ctx, C.x, C.y, 'C', '#1c1917');
+
+                if (caseType === 1) {
+                    caption.textContent = 'Trường hợp 1: Cát tuyến cắt 2 cạnh AB và AC, và phần kéo dài của BC.';
+                    
+                    const F = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+                    const E = { x: (A.x + C.x) / 2 + 20, y: (A.y + C.y) / 2 + 10 };
+                    
+                    const D_x = B.x - (C.x - B.x) * 0.5;
+                    const D_y = B.y; 
+                    const D = { x: D_x, y: D_y };
+
+                    drawDashedLine(ctx, C.x, C.y, D.x, D.y);
+                    
+                    drawLine(ctx, F.x - 100, F.y - 70, D.x + 100, D.y + 45, '#3b82f6', 2.5);
+                    
+                    drawPoint(ctx, F.x, F.y, 'F');
+                    drawPoint(ctx, E.x, E.y, 'E');
+                    drawPoint(ctx, D.x, D.y, 'D');
+
+                } else if (caseType === 2) {
+                    caption.textContent = 'Trường hợp 2: Cát tuyến cắt 3 phần kéo dài của các cạnh.';
+
+                    const F_x = A.x - (B.x - A.x) * 0.4;
+                    const F_y = A.y - (B.y - A.y) * 0.4;
+                    const F = { x: F_x, y: F_y };
+
+                    const E_x = C.x + (C.x - A.x) * 0.4;
+                    const E_y = C.y + (C.y - A.y) * 0.4;
+                    const E = { x: E_x, y: E_y };
+
+                    const D_x = C.x + (C.x - B.x) * 0.5;
+                    const D_y = C.y;
+                    const D = { x: D_x, y: D_y };
+                    
+                    drawDashedLine(ctx, B.x, B.y, F.x, F.y);
+                    drawDashedLine(ctx, A.x, A.y, E.x, E.y);
+                    drawDashedLine(ctx, B.x, B.y, D.x, D.y);
+
+                    drawLine(ctx, F.x, F.y, E.x, E.y, '#3b82f6', 2.5);
+
+                    drawPoint(ctx, F.x, F.y, 'F');
+                    drawPoint(ctx, E.x, E.y, 'E');
+                    drawPoint(ctx, D.x, D.y, 'D');
+                }
+            };
+            
+            const drawProof1Diagram = () => {
+                if (!proof1Canvas) return;
+                const ctx = proof1Canvas.getContext('2d');
+                const w = proof1Canvas.width = proof1Canvas.clientWidth;
+                const h = proof1Canvas.height = proof1Canvas.clientHeight;
+                ctx.clearRect(0, 0, w, h);
+
+                const A = { x: w * 0.5, y: h * 0.1 };
+                const B = { x: w * 0.15, y: h * 0.6 };
+                const C = { x: w * 0.7, y: h * 0.7 };
+                
+                drawLine(ctx, A.x, A.y, B.x, B.y, '#1c1917', 2);
+                drawLine(ctx, B.x, B.y, C.x, C.y, '#1c1917', 2);
+                drawLine(ctx, C.x, C.y, A.x, A.y, '#1c1917', 2);
+                drawPoint(ctx, A.x, A.y, 'A', '#1c1917');
+                drawPoint(ctx, B.x, B.y, 'B', '#1c1917');
+                drawPoint(ctx, C.x, C.y, 'C', '#1c1917');
+
+                const F = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+                const D = { x: B.x + (C.x - B.x) * 1.5, y: B.y + (C.y - B.y) * 1.5 };
+                const E = { x: (A.x + C.x) / 2 + 20, y: (A.y + C.y) / 2 + 10 };
+                
+                drawLine(ctx, F.x - 100, F.y - 75, D.x - 50, D.y - 25, '#3b82f6', 2);
+                drawPoint(ctx, F.x, F.y, 'F');
+                drawPoint(ctx, E.x, E.y, 'E');
+                
+                drawDashedLine(ctx, B.x, B.y, D.x, D.y);
+                drawPoint(ctx, D.x, D.y, 'D');
+                
+                const H = { x: A.x + 40, y: A.y + 110 };
+                const I = { x: B.x + 75, y: B.y + 205 };
+                const K = { x: C.x + 55, y: C.y + 150 };
+
+                drawDashedLine(ctx, A.x, A.y, H.x, H.y, '#059669');
+                drawDashedLine(ctx, B.x, B.y, I.x, I.y, '#059669');
+                drawDashedLine(ctx, C.x, C.y, K.x, K.y, '#059669');
+                drawPoint(ctx, H.x, H.y, 'H', '#059669');
+                drawPoint(ctx, I.x, I.y, 'I', '#059669');
+                drawPoint(ctx, K.x, K.y, 'K', '#059669');
+            };
+
+            const drawProof2Diagram = () => {
+                if (!proof2Canvas) return;
+                const ctx = proof2Canvas.getContext('2d');
+                const w = proof2Canvas.width = proof2Canvas.clientWidth;
+                const h = proof2Canvas.height = proof2Canvas.clientHeight;
+                ctx.clearRect(0, 0, w, h);
+
+                const A = { x: w * 0.5, y: h * 0.15 };
+                const B = { x: w * 0.2, y: h * 0.8 };
+                const C = { x: w * 0.8, y: h * 0.6 };
+
+                drawLine(ctx, A.x, A.y, B.x, B.y, '#1c1917', 2);
+                drawLine(ctx, B.x, B.y, C.x, C.y, '#1c1917', 2);
+                drawLine(ctx, C.x, C.y, A.x, A.y, '#1c1917', 2);
+                drawPoint(ctx, A.x, A.y, 'A', '#1c1917');
+                drawPoint(ctx, B.x, B.y, 'B', '#1c1917');
+                drawPoint(ctx, C.x, C.y, 'C', '#1c1917');
+
+                const F = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+                const D = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
+                const E = { x: A.x + (C.x - A.x) * 1.5, y: A.y + (C.y - A.y) * 1.5 };
+
+                drawLine(ctx, F.x - 50, F.y - 35, E.x, E.y, '#3b82f6', 2);
+                drawPoint(ctx, F.x, F.y, 'F');
+                drawPoint(ctx, D.x, D.y, 'D');
+                drawDashedLine(ctx, C.x, C.y, E.x, E.y);
+                drawPoint(ctx, E.x, E.y, 'E');
+
+                const G = { x: E.x - 50, y: E.y + 10 };
+                drawDashedLine(ctx, C.x, C.y, G.x, G.y, '#d97706', 2);
+                drawPoint(ctx, G.x, G.y, 'G', '#d97706');
+                drawLabel(ctx, 'CG || AB', G.x, G.y + 20, '#d97706');
+            };
+
+            case1Btn.addEventListener('click', () => drawMainDiagram(1));
+            case2Btn.addEventListener('click', () => drawMainDiagram(2));
+
+            drawMainDiagram(1); 
+            drawProof1Diagram();
+            drawProof2Diagram();
+        });
+    </script>
+</body>
+</html>
