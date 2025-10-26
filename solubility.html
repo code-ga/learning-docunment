@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title will be updated by JS -->
+    <title>Sổ Tay Tính Tan Hóa Học (Có liên kết Wiki)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chem-formula {
+            font-family: 'Noto Sans Mono', monospace; /* Match LaTeX \texttt */
+            font-size: 0.95em;
+            background-color: #f3f4f6; /* gray-100 */
+            padding: 0.1em 0.3em;
+            border-radius: 0.25rem;
+            border: 1px solid #e5e7eb; /* gray-200 */
+            display: inline-block; /* Prevent wrapping inside code */
+            margin: 0 0.1em; /* Add slight margin */
+            white-space: nowrap; /* Prevent wrapping */
+        }
+        .wiki-link {
+             color: #2563eb; /* blue-600 */
+             text-decoration: none;
+        }
+        .wiki-link:hover {
+             text-decoration: underline;
+        }
+        .section-title {
+            color: #047857; /* emerald-700 */
+            border-bottom: 2px solid #d1fae5; /* emerald-100 */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .subsection-title {
+            color: #374151; /* gray-700 */
+            margin-bottom: 1rem;
+            margin-top: 1.5rem;
+        }
+        .rule-box {
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+         .rule-box-red {
+            background-color: #fef2f2; /* red-50 */
+            border: 1px solid #fee2e2; /* red-100 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .meo-box {
+            background-color: #ecfdf5; /* emerald-50 */
+            border: 1px solid #a7f3d0; /* emerald-200 */
+            color: #065f46; /* emerald-800 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .luuy-box {
+            background-color: #fffbeb; /* yellow-50 */
+            border: 1px solid #fef3c7; /* yellow-200 */
+            color: #713f12; /* yellow-800 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        /* Define colors based on LaTeX definitions */
+        .text-emerald-700 { color: #047857; }
+        .text-emerald-600 { color: #059669; }
+        .text-gray-700 { color: #374151; }
+        .text-gray-600 { color: #4B5563; }
+        .text-gray-800 { color: #1F2937; }
+        .text-gray-900 { color: #111827; }
+        .text-red-600 { color: #DC2626; }
+        .text-red-700 { color: #B91C1C; }
+        .text-red-800 { color: #991b1b; }
+        .text-yellow-800 { color: #854D0E; }
+        .text-yellow-700 { color: #A16207; }
+        .text-yellow-600 { color: #CA8A04; }
+        .text-green-600 { color: #16A34A; }
+        .text-green-700 { color: #15803D; }
+        .text-green-800 { color: #166534; }
+        .text-blue-600 { color: #2563EB; }
+        .text-blue-700 { color: #1D4ED8; }
+
+        /* Style for language button */
+        #lang-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #d1fae5; /* emerald-100 */
+            color: #065f46; /* emerald-800 */
+            border: 1px solid #6ee7b7; /* emerald-300 */
+            border-radius: 0.375rem; /* rounded-md */
+            cursor: pointer;
+            font-size: 0.875rem; /* text-sm */
+            transition: background-color 0.2s;
+        }
+        #lang-toggle:hover {
+            background-color: #a7f3d0; /* emerald-200 */
+        }
+        /* Ensure container handles absolute positioning */
+        .container {
+            position: relative;
+        }
+    </style>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Mono&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto max-w-4xl p-6 pt-16 md:pt-6"> <!-- Added top padding for mobile button space -->
+        <button id="lang-toggle">Switch to English</button>
+        <header class="text-center my-8">
+            <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-emerald-700">Sổ Tay Tính Tan Hóa Học</h1>
+            <p id="sub-title" class="text-lg text-gray-600 mt-2">Tra cứu tính tan của Base và Muối (kèm liên kết Wikipedia)</p>
+        </header>
+
+        <nav class="mb-8 p-4 bg-white rounded-lg shadow">
+             <h2 id="toc-title" class="text-xl font-semibold mb-3 text-emerald-600">Mục lục</h2>
+             <ul class="list-disc list-inside space-y-1">
+                 <li><a href="#base" class="wiki-link" data-lang-key="toc_base">PHẦN 1: BASE (BAZƠ)</a></li>
+                 <li><a href="#muoi" class="wiki-link" data-lang-key="toc_salt">PHẦN 2: MUỐI</a></li>
+                 <li><a href="#ket-tua" class="wiki-link" data-lang-key="toc_precipitate">PHẦN 3: TÓM TẮT CÁC KẾT TỦA (Theo màu sắc)</a></li>
+             </ul>
+        </nav>
+
+        <main>
+            <section id="base" class="mb-10">
+                <h2 class="text-2xl font-bold section-title" data-lang-key="sec_base_title">PHẦN 1: BASE (BAZƠ)</h2>
+
+                <h3 class="text-xl font-semibold subsection-title" data-lang-key="subsec_base_soluble_title">1. Base tan (Kiềm)</h3>
+                <p class="text-gray-600 mb-4" data-lang-key="base_soluble_desc">Bao gồm các base của kim loại kiềm và một số kim loại kiềm thổ:</p>
+                <ul class="list-disc list-inside space-y-2 pl-4 mb-4">
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Natri_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">NaOH</a></code> (<a href="https://vi.wikipedia.org/wiki/Natri_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="naoh_name">Natri hiđroxit</a>)</li>
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Kali_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">KOH</a></code> (<a href="https://vi.wikipedia.org/wiki/Kali_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="koh_name">Kali hiđroxit</a>)</li>
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Liti_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">LiOH</a></code> (<a href="https://vi.wikipedia.org/wiki/Liti_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="lioh_name">Liti hiđroxit</a>)</li>
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Bari_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Ba(OH)2</a></code> (<a href="https://vi.wikipedia.org/wiki/Bari_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="baoh2_name">Bari hiđroxit</a>)</li>
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Canxi_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Ca(OH)2</a></code> (<a href="https://vi.wikipedia.org/wiki/Canxi_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="caoh2_name">Canxi hiđroxit</a>) - <span class="text-red-600 font-semibold" data-lang-key="note">Lưu ý:</span> <span data-lang-key="caoh2_note">Chất <strong class="font-semibold">ít tan</strong>, phần tan tạo dung dịch kiềm mạnh.</span></li>
+                </ul>
+
+                <div class="meo-box">
+                    <p><strong data-lang-key="mnemonic">Mẹo ghi nhớ:</strong> <span data-lang-key="base_mnemonic_detail"><strong>K</strong>hi <strong>Nà</strong>o <strong>Bạ</strong>n <strong>Cầ</strong>n <strong>Li</strong> (K, Na, Ba, Ca, Li).</span></p>
+                </div>
+
+                <h4 class="font-semibold subsection-title mt-6" data-lang-key="special_case">Trường hợp đặc biệt:</h4>
+                <ul class="list-disc list-inside space-y-2 pl-4">
+                     <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Amoniac" target="_blank" rel="noopener noreferrer" class="wiki-link">NH3</a></code> (<a href="https://vi.wikipedia.org/wiki/Amoniac" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="nh3_name">Amoniac</a>): <span data-lang-key="nh3_desc">Khí tan tốt trong nước, tạo dung dịch <code class="chem-formula">NH3</code> có tính base yếu.</span></li>
+                </ul>
+
+                <h3 class="text-xl font-semibold subsection-title" data-lang-key="subsec_base_insoluble_title">2. Base không tan</h3>
+                <p class="text-gray-600 mb-4" data-lang-key="base_insoluble_desc">Là base của các kim loại còn lại. Hầu hết là chất kết tủa:</p>
+                <ul class="list-disc list-inside space-y-2 pl-4">
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Magie_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Mg(OH)2</a></code> (<a href="https://vi.wikipedia.org/wiki/Magie_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="mgoh2_name">Magie hiđroxit</a>) - <span class="text-gray-600" data-lang-key="ppt_white">Kết tủa trắng.</span></li>
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Nh%C3%B4m_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Al(OH)3</a></code> (<a href="https://vi.wikipedia.org/wiki/Nh%C3%B4m_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="aloh3_name">Nhôm hiđroxit</a>) - <span class="text-gray-600" data-lang-key="ppt_white_gel">Kết tủa trắng keo.</span></li>
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/K%E1%BA%BDm_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Zn(OH)2</a></code> (<a href="https://vi.wikipedia.org/wiki/K%E1%BA%BDm_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="znoh2_name">Kẽm hiđroxit</a>) - <span class="text-gray-600" data-lang-key="ppt_white">Kết tủa trắng.</span></li>
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/%C4%90%E1%BB%93ng(II)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Cu(OH)2</a></code> (<a href="https://vi.wikipedia.org/wiki/%C4%90%E1%BB%93ng(II)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="cuoh2_name">Đồng(II) hiđroxit</a>) - <span class="text-blue-600" data-lang-key="ppt_blue">Kết tủa xanh lam.</span></li>
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(II)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Fe(OH)2</a></code> (<a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(II)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="feoh2_name">Sắt(II) hiđroxit</a>) - <span class="text-green-700" data-lang-key="ppt_greenish_white">Kết tủa trắng xanh (hóa nâu đỏ).</span></li>
+                    <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(III)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Fe(OH)3</a></code> (<a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(III)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="feoh3_name">Sắt(III) hiđroxit</a>) - <span class="text-red-700" data-lang-key="ppt_reddish_brown">Kết tủa nâu đỏ.</span></li>
+                </ul>
+
+                <div class="luuy-box">
+                     <p><strong data-lang-key="important_note">Lưu ý quan trọng:</strong> <span data-lang-key="amphoteric_note"><code class="chem-formula">Al(OH)3</code> và <code class="chem-formula">Zn(OH)2</code> là các hiđroxit <strong class="font-semibold">lưỡng tính</strong> (tan trong cả axit mạnh và kiềm mạnh).</span></p>
+                </div>
+            </section>
+
+            <section id="muoi" class="mb-10">
+                <h2 class="text-2xl font-bold section-title" data-lang-key="sec_salt_title">PHẦN 2: MUỐI</h2>
+
+                <div class="rule-box">
+                    <h4 class="text-lg font-semibold text-green-700 mb-2" data-lang-key="rule1_title">Quy tắc 1: Các nhóm muối LUÔN TAN</h4>
+                    <p class="text-gray-600 mb-3" data-lang-key="rule1_desc">Tất cả các muối thuộc các nhóm sau đây đều tan:</p>
+                    <ol class="list-decimal list-inside space-y-1 pl-4">
+                        <li data-lang-key="rule1_item1">Muối của kim loại kiềm (<code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Natri" target="_blank" rel="noopener noreferrer" class="wiki-link">Na+</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Kali" target="_blank" rel="noopener noreferrer" class="wiki-link">K+</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Liti" target="_blank" rel="noopener noreferrer" class="wiki-link">Li+</a></code>)</li>
+                        <li data-lang-key="rule1_item2">Muối <a href="https://vi.wikipedia.org/wiki/Amoni" target="_blank" rel="noopener noreferrer" class="wiki-link">Amoni</a> (<code class="chem-formula">NH4+</code>)</li>
+                        <li data-lang-key="rule1_item3">Muối <a href="https://vi.wikipedia.org/wiki/Nitrat" target="_blank" rel="noopener noreferrer" class="wiki-link">Nitrat</a> (<code class="chem-formula">NO3-</code>)</li>
+                        <li data-lang-key="rule1_item4">Muối <a href="https://vi.wikipedia.org/wiki/Axetat" target="_blank" rel="noopener noreferrer" class="wiki-link">Axetat</a> (<code class="chem-formula">CH3COO-</code>) (trừ <code class="chem-formula">AgCH3COO</code> ít tan)</li>
+                    </ol>
+                </div>
+
+                <div class="rule-box">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2" data-lang-key="rule2_title">Quy tắc 2: Muối Clorua (Cl-), Bromua (Br-), Iotua (I-)</h4>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><span class="text-green-600 font-semibold" data-lang-key="mostly_soluble">Hầu hết đều tan.</span></li>
+                        <li><span class="text-red-600 font-semibold" data-lang-key="exception_ppt">Ngoại lệ (Kết tủa):</span>
+                            <ul class="list-circle list-inside space-y-1 pl-6 mt-1">
+                                <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_clorua" target="_blank" rel="noopener noreferrer" class="wiki-link">AgCl</a></code> (<a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_clorua" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="agcl_name">Bạc clorua</a>) - <span data-lang-key="ppt_white">Kết tủa trắng.</span></li>
+                                <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_clorua" target="_blank" rel="noopener noreferrer" class="wiki-link">PbCl2</a></code> (<a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_clorua" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="pbcl2_name">Chì(II) clorua</a>) - <span data-lang-key="pbcl2_note">Kết tủa trắng (tan ít trong nước nóng).</span></li>
+                                <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_bromua" target="_blank" rel="noopener noreferrer" class="wiki-link">AgBr</a></code> (<a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_bromua" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="agbr_name">Bạc bromua</a>) - <span class="text-yellow-700" data-lang-key="ppt_pale_yellow">Kết tủa vàng nhạt.</span></li>
+                                <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_iotua" target="_blank" rel="noopener noreferrer" class="wiki-link">AgI</a></code> (<a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_iotua" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="agi_name">Bạc iotua</a>) - <span class="text-yellow-800" data-lang-key="ppt_yellow">Kết tủa vàng đậm.</span></li>
+                                <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_iotua" target="_blank" rel="noopener noreferrer" class="wiki-link">PbI2</a></code> (<a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_iotua" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="pbi2_name">Chì(II) iotua</a>) - <span class="text-yellow-600" data-lang-key="ppt_yellow_bold">Kết tủa vàng.</span></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                 <div class="rule-box">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2" data-lang-key="rule3_title">Quy tắc 3: Muối Sunfat (SO4<sup>2-</sup>)</h4>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><span class="text-green-600 font-semibold" data-lang-key="mostly_soluble">Hầu hết đều tan.</span></li>
+                        <li><span class="text-red-600 font-semibold" data-lang-key="exception_ppt">Ngoại lệ (Kết tủa):</span>
+                             <ul class="list-circle list-inside space-y-1 pl-6 mt-1">
+                                <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Bari_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link">BaSO4</a></code> (<a href="https://vi.wikipedia.org/wiki/Bari_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="baso4_name">Bari sunfat</a>) - <span data-lang-key="baso4_note">Kết tủa trắng (rất bền, không tan trong axit).</span></li>
+                                <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link">PbSO4</a></code> (<a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="pbso4_name">Chì(II) sunfat</a>) - <span data-lang-key="ppt_white">Kết tủa trắng.</span></li>
+                            </ul>
+                        </li>
+                         <li><span class="text-yellow-600 font-semibold" data-lang-key="exception_sparingly">Ngoại lệ (Ít tan):</span>
+                             <ul class="list-circle list-inside space-y-1 pl-6 mt-1">
+                                <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Canxi_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link">CaSO4</a></code> (<a href="https://vi.wikipedia.org/wiki/Canxi_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="caso4_name">Canxi sunfat</a>) - <span data-lang-key="caso4_note">(Thạch cao).</span></li>
+                                <li><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link">Ag2SO4</a></code> (<a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link" data-lang-key="ag2so4_name">Bạc sunfat</a>).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                 <div class="rule-box-red">
+                    <h4 class="text-lg font-semibold text-red-700 mb-2" data-lang-key="rule4_title">Quy tắc 4: Muối Cacbonat (CO3<sup>2-</sup>), Sunfit (SO3<sup>2-</sup>), Photphat (PO4<sup>3-</sup>)</h4>
+                     <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><span class="text-red-600 font-semibold" data-lang-key="mostly_insoluble">Hầu hết KHÔNG TAN.</span></li>
+                        <li><span class="text-green-600 font-semibold" data-lang-key="exception_soluble">Ngoại lệ (Tan):</span> <span data-lang-key="rule4_exception_detail">Các muối của <code class="chem-formula">Na+</code>, <code class="chem-formula">K+</code>, <code class="chem-formula">NH4+</code>.</span></li>
+                        <li><strong data-lang-key="insoluble_examples">Ví dụ không tan:</strong> <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Canxi_cacbonat" target="_blank" rel="noopener noreferrer" class="wiki-link">CaCO3</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Bari_cacbonat" target="_blank" rel="noopener noreferrer" class="wiki-link">BaCO3</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Magie_cacbonat" target="_blank" rel="noopener noreferrer" class="wiki-link">MgCO3</a></code>, <code class="chem-formula">CaSO3</code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(III)_photphat" target="_blank" rel="noopener noreferrer" class="wiki-link">FePO4</a></code>...</li>
+                    </ul>
+                </div>
+
+                <div class="rule-box-red">
+                    <h4 class="text-lg font-semibold text-red-700 mb-2" data-lang-key="rule5_title">Quy tắc 5: Muối Sunfua (S<sup>2-</sup>)</h4>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><span class="text-red-600 font-semibold" data-lang-key="mostly_insoluble">Hầu hết KHÔNG TAN.</span></li>
+                         <li><span class="text-green-600 font-semibold" data-lang-key="exception_soluble">Ngoại lệ (Tan):</span> <span data-lang-key="rule5_exception_detail">Muối của <code class="chem-formula">Na+</code>, <code class="chem-formula">K+</code>, <code class="chem-formula">NH4+</code>.</span></li>
+                         <li><strong data-lang-key="sulfide_ppt_examples">Một số kết tủa <code class="chem-formula">S<sup>2-</sup></code> thường gặp:</strong>
+                             <ul class="list-circle list-inside space-y-1 pl-6 mt-1">
+                                <li data-lang-key="black_sulfides"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/%C4%90%E1%BB%93ng(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">CuS</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">PbS</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">Ag2S</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">FeS</a></code> - <span class="text-gray-900 font-semibold" data-lang-key="ppt_black">Kết tủa đen.</span></li>
+                                <li data-lang-key="white_sulfide"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/K%E1%BA%BDm_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">ZnS</a></code> - <span class="font-semibold" data-lang-key="ppt_white">Kết tủa trắng.</span></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+             <section id="ket-tua" class="mb-10">
+                <h2 class="text-2xl font-bold section-title" data-lang-key="sec_precipitate_title">PHẦN 3: TÓM TẮT CÁC KẾT TỦA (Theo màu sắc)</h2>
+
+                <h3 class="text-xl font-semibold subsection-title" data-lang-key="subsec_white_ppt_title">1. Kết tủa Trắng</h3>
+                <div class="flex flex-wrap gap-2 text-sm mb-6" data-lang-key="white_ppt_list">
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_clorua" target="_blank" rel="noopener noreferrer" class="wiki-link">AgCl</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_clorua" target="_blank" rel="noopener noreferrer" class="wiki-link">PbCl2</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Bari_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link">BaSO4</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Canxi_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link">CaSO4</a></code> (ít tan),
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link">PbSO4</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Canxi_cacbonat" target="_blank" rel="noopener noreferrer" class="wiki-link">CaCO3</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Bari_cacbonat" target="_blank" rel="noopener noreferrer" class="wiki-link">BaCO3</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Magie_cacbonat" target="_blank" rel="noopener noreferrer" class="wiki-link">MgCO3</a></code>,
+                    <code class="chem-formula">CaSO3</code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Magie_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Mg(OH)2</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Nh%C3%B4m_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Al(OH)3</a></code> (trắng keo),
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/K%E1%BA%BDm_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Zn(OH)2</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/K%E1%BA%BDm_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">ZnS</a></code>
+                </div>
+
+                <h3 class="text-xl font-semibold subsection-title" data-lang-key="subsec_colored_ppt_title">2. Kết tủa có màu</h3>
+                 <ul class="list-disc list-inside space-y-2 pl-4">
+                    <li data-lang-key="cuoh2_color"><span class="text-blue-700 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/%C4%90%E1%BB%93ng(II)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Cu(OH)2</a></code></span> (Xanh lam)</li>
+                    <li data-lang-key="feoh2_color"><span class="text-green-800 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(II)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Fe(OH)2</a></code></span> (Trắng xanh → Nâu đỏ)</li>
+                    <li data-lang-key="feoh3_color"><span class="text-red-700 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(III)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Fe(OH)3</a></code></span> (Nâu đỏ)</li>
+                    <li data-lang-key="ag3po4_color"><span class="text-yellow-700 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_photphat" target="_blank" rel="noopener noreferrer" class="wiki-link">Ag3PO4</a></code></span> (Vàng)</li>
+                    <li data-lang-key="pbi2_color"><span class="text-yellow-800 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_iotua" target="_blank" rel="noopener noreferrer" class="wiki-link">PbI2</a></code></span> (Vàng)</li>
+                    <li data-lang-key="agbr_color"><span class="text-yellow-700 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_bromua" target="_blank" rel="noopener noreferrer" class="wiki-link">AgBr</a></code></span> (Vàng nhạt)</li>
+                    <li data-lang-key="agi_color"><span class="text-yellow-800 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_iotua" target="_blank" rel="noopener noreferrer" class="wiki-link">AgI</a></code></span> (Vàng đậm)</li>
+                    <li data-lang-key="black_sulfides_color"><span class="text-gray-900 font-semibold">
+                        <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/%C4%90%E1%BB%93ng(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">CuS</a></code>,
+                        <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">PbS</a></code>,
+                        <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">Ag2S</a></code>,
+                        <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">FeS</a></code>
+                    </span> (Đen)</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer class="text-center text-gray-500 mt-12 py-4 border-t border-gray-200">
+             <p data-lang-key="footer_text">Sổ tay Hóa học - Biên soạn dựa trên tài liệu gốc.</p>
+        </footer>
+    </div>
+
+    <script>
+        const translations = {
+            vi: {
+                page_title: "Sổ Tay Tính Tan Hóa Học (Có liên kết Wiki)",
+                toggle_button: "Switch to English",
+                main_title: "Sổ Tay Tính Tan Hóa Học",
+                sub_title: "Tra cứu tính tan của Base và Muối (kèm liên kết Wikipedia)",
+                toc_title: "Mục lục",
+                toc_base: "PHẦN 1: BASE (BAZƠ)",
+                toc_salt: "PHẦN 2: MUỐI",
+                toc_precipitate: "PHẦN 3: TÓM TẮT CÁC KẾT TỦA (Theo màu sắc)",
+                sec_base_title: "PHẦN 1: BASE (BAZƠ)",
+                subsec_base_soluble_title: "1. Base tan (Kiềm)",
+                base_soluble_desc: "Bao gồm các base của kim loại kiềm và một số kim loại kiềm thổ:",
+                naoh_name: "Natri hiđroxit",
+                koh_name: "Kali hiđroxit",
+                lioh_name: "Liti hiđroxit",
+                baoh2_name: "Bari hiđroxit",
+                caoh2_name: "Canxi hiđroxit",
+                note: "Lưu ý:",
+                caoh2_note: 'Chất <strong class="font-semibold">ít tan</strong>, phần tan tạo dung dịch kiềm mạnh.',
+                mnemonic: "Mẹo ghi nhớ:",
+                base_mnemonic_detail: "<strong>K</strong>hi <strong>Nà</strong>o <strong>Bạ</strong>n <strong>Cầ</strong>n <strong>Li</strong> (K, Na, Ba, Ca, Li).",
+                special_case: "Trường hợp đặc biệt:",
+                nh3_name: "Amoniac",
+                nh3_desc: 'Khí tan tốt trong nước, tạo dung dịch <code class="chem-formula">NH3</code> có tính base yếu.',
+                subsec_base_insoluble_title: "2. Base không tan",
+                base_insoluble_desc: "Là base của các kim loại còn lại. Hầu hết là chất kết tủa:",
+                mgoh2_name: "Magie hiđroxit",
+                aloh3_name: "Nhôm hiđroxit",
+                znoh2_name: "Kẽm hiđroxit",
+                cuoh2_name: "Đồng(II) hiđroxit",
+                feoh2_name: "Sắt(II) hiđroxit",
+                feoh3_name: "Sắt(III) hiđroxit",
+                ppt_white: "Kết tủa trắng.",
+                ppt_white_gel: "Kết tủa trắng keo.",
+                ppt_blue: "Kết tủa xanh lam.",
+                ppt_greenish_white: "Kết tủa trắng xanh (hóa nâu đỏ).",
+                ppt_reddish_brown: "Kết tủa nâu đỏ.",
+                important_note: "Lưu ý quan trọng:",
+                amphoteric_note: '<code class="chem-formula">Al(OH)3</code> và <code class="chem-formula">Zn(OH)2</code> là các hiđroxit <strong class="font-semibold">lưỡng tính</strong> (tan trong cả axit mạnh và kiềm mạnh).',
+                sec_salt_title: "PHẦN 2: MUỐI",
+                rule1_title: "Quy tắc 1: Các nhóm muối LUÔN TAN",
+                rule1_desc: "Tất cả các muối thuộc các nhóm sau đây đều tan:",
+                rule1_item1: 'Muối của kim loại kiềm (<code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Natri" target="_blank" rel="noopener noreferrer" class="wiki-link">Na+</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Kali" target="_blank" rel="noopener noreferrer" class="wiki-link">K+</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Liti" target="_blank" rel="noopener noreferrer" class="wiki-link">Li+</a></code>)',
+                rule1_item2: 'Muối <a href="https://vi.wikipedia.org/wiki/Amoni" target="_blank" rel="noopener noreferrer" class="wiki-link">Amoni</a> (<code class="chem-formula">NH4+</code>)',
+                rule1_item3: 'Muối <a href="https://vi.wikipedia.org/wiki/Nitrat" target="_blank" rel="noopener noreferrer" class="wiki-link">Nitrat</a> (<code class="chem-formula">NO3-</code>)',
+                rule1_item4: 'Muối <a href="https://vi.wikipedia.org/wiki/Axetat" target="_blank" rel="noopener noreferrer" class="wiki-link">Axetat</a> (<code class="chem-formula">CH3COO-</code>) (trừ <code class="chem-formula">AgCH3COO</code> ít tan)',
+                rule2_title: "Quy tắc 2: Muối Clorua (Cl-), Bromua (Br-), Iotua (I-)",
+                mostly_soluble: "Hầu hết đều tan.",
+                exception_ppt: "Ngoại lệ (Kết tủa):",
+                agcl_name: "Bạc clorua",
+                pbcl2_name: "Chì(II) clorua",
+                pbcl2_note: "Kết tủa trắng (tan ít trong nước nóng).",
+                agbr_name: "Bạc bromua",
+                ppt_pale_yellow: "Kết tủa vàng nhạt.",
+                agi_name: "Bạc iotua",
+                ppt_yellow: "Kết tủa vàng đậm.",
+                pbi2_name: "Chì(II) iotua",
+                ppt_yellow_bold: "Kết tủa vàng.",
+                rule3_title: "Quy tắc 3: Muối Sunfat (SO4<sup>2-</sup>)",
+                baso4_name: "Bari sunfat",
+                baso4_note: "Kết tủa trắng (rất bền, không tan trong axit).",
+                pbso4_name: "Chì(II) sunfat",
+                exception_sparingly: "Ngoại lệ (Ít tan):",
+                caso4_name: "Canxi sunfat",
+                caso4_note: "(Thạch cao).",
+                ag2so4_name: "Bạc sunfat",
+                rule4_title: "Quy tắc 4: Muối Cacbonat (CO3<sup>2-</sup>), Sunfit (SO3<sup>2-</sup>), Photphat (PO4<sup>3-</sup>)",
+                mostly_insoluble: "Hầu hết KHÔNG TAN.",
+                exception_soluble: "Ngoại lệ (Tan):",
+                rule4_exception_detail: 'Các muối của <code class="chem-formula">Na+</code>, <code class="chem-formula">K+</code>, <code class="chem-formula">NH4+</code>.',
+                insoluble_examples: 'Ví dụ không tan:',
+                rule5_title: "Quy tắc 5: Muối Sunfua (S<sup>2-</sup>)",
+                rule5_exception_detail: 'Muối của <code class="chem-formula">Na+</code>, <code class="chem-formula">K+</code>, <code class="chem-formula">NH4+</code>.',
+                sulfide_ppt_examples: 'Một số kết tủa <code class="chem-formula">S<sup>2-</sup></code> thường gặp:',
+                black_sulfides: '<code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/%C4%90%E1%BB%93ng(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">CuS</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">PbS</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">Ag2S</a></code>, <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">FeS</a></code> - <span class="text-gray-900 font-semibold" data-lang-key="ppt_black">Kết tủa đen.</span>',
+                white_sulfide: '<code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/K%E1%BA%BDm_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">ZnS</a></code> - <span class="font-semibold" data-lang-key="ppt_white">Kết tủa trắng.</span>',
+                ppt_black: "Kết tủa đen.",
+                sec_precipitate_title: "PHẦN 3: TÓM TẮT CÁC KẾT TỦA (Theo màu sắc)",
+                subsec_white_ppt_title: "1. Kết tủa Trắng",
+                white_ppt_list: `
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_clorua" target="_blank" rel="noopener noreferrer" class="wiki-link">AgCl</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_clorua" target="_blank" rel="noopener noreferrer" class="wiki-link">PbCl2</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Bari_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link">BaSO4</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Canxi_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link">CaSO4</a></code> (ít tan),
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_sunfat" target="_blank" rel="noopener noreferrer" class="wiki-link">PbSO4</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Canxi_cacbonat" target="_blank" rel="noopener noreferrer" class="wiki-link">CaCO3</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Bari_cacbonat" target="_blank" rel="noopener noreferrer" class="wiki-link">BaCO3</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Magie_cacbonat" target="_blank" rel="noopener noreferrer" class="wiki-link">MgCO3</a></code>,
+                    <code class="chem-formula">CaSO3</code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Magie_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Mg(OH)2</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Nh%C3%B4m_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Al(OH)3</a></code> (trắng keo),
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/K%E1%BA%BDm_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Zn(OH)2</a></code>,
+                    <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/K%E1%BA%BDm_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">ZnS</a></code>`,
+                subsec_colored_ppt_title: "2. Kết tủa có màu",
+                cuoh2_color: '<span class="text-blue-700 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/%C4%90%E1%BB%93ng(II)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Cu(OH)2</a></code></span> (Xanh lam)',
+                feoh2_color: '<span class="text-green-800 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(II)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Fe(OH)2</a></code></span> (Trắng xanh → Nâu đỏ)',
+                feoh3_color: '<span class="text-red-700 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(III)_hi%C4%91roxit" target="_blank" rel="noopener noreferrer" class="wiki-link">Fe(OH)3</a></code></span> (Nâu đỏ)',
+                ag3po4_color: '<span class="text-yellow-700 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_photphat" target="_blank" rel="noopener noreferrer" class="wiki-link">Ag3PO4</a></code></span> (Vàng)',
+                pbi2_color: '<span class="text-yellow-800 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_iotua" target="_blank" rel="noopener noreferrer" class="wiki-link">PbI2</a></code></span> (Vàng)',
+                agbr_color: '<span class="text-yellow-700 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_bromua" target="_blank" rel="noopener noreferrer" class="wiki-link">AgBr</a></code></span> (Vàng nhạt)',
+                agi_color: '<span class="text-yellow-800 font-semibold"><code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_iotua" target="_blank" rel="noopener noreferrer" class="wiki-link">AgI</a></code></span> (Vàng đậm)',
+                black_sulfides_color: `<span class="text-gray-900 font-semibold">
+                        <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/%C4%90%E1%BB%93ng(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">CuS</a></code>,
+                        <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/Ch%C3%AC(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">PbS</a></code>,
+                        <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/B%E1%BA%A1c_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">Ag2S</a></code>,
+                        <code class="chem-formula"><a href="https://vi.wikipedia.org/wiki/S%E1%BA%AFt(II)_sunfua" target="_blank" rel="noopener noreferrer" class="wiki-link">FeS</a></code>
+                    </span> (Đen)`,
+                footer_text: "Sổ tay Hóa học - Biên soạn dựa trên tài liệu gốc."
+
+            },
+            en: {
+                page_title: "Chemistry Solubility Handbook (with Wiki Links)",
+                toggle_button: "Chuyển sang Tiếng Việt",
+                main_title: "Chemistry Solubility Handbook",
+                sub_title: "Look up Base and Salt Solubility (with Wikipedia links)",
+                toc_title: "Table of Contents",
+                toc_base: "PART 1: BASES",
+                toc_salt: "PART 2: SALTS",
+                toc_precipitate: "PART 3: SUMMARY OF PRECIPITATES (By Color)",
+                sec_base_title: "PART 1: BASES",
+                subsec_base_soluble_title: "1. Soluble Bases (Alkalis)",
+                base_soluble_desc: "Includes bases of alkali metals and some alkaline earth metals:",
+                naoh_name: "Sodium hydroxide",
+                koh_name: "Potassium hydroxide",
+                lioh_name: "Lithium hydroxide",
+                baoh2_name: "Barium hydroxide",
+                caoh2_name: "Calcium hydroxide",
+                note: "Note:",
+                caoh2_note: 'Substance is <strong class="font-semibold">sparingly soluble</strong>, the dissolved portion forms a strong alkali solution.',
+                mnemonic: "Mnemonic:",
+                base_mnemonic_detail: "Remember the metals that form soluble bases (using Vietnamese sounds): Khi Nào Bạn Cần Li (K, Na, Ba, Ca, Li).",
+                special_case: "Special Case:",
+                nh3_name: "Ammonia",
+                nh3_desc: 'A gas that dissolves well in water, forming a weak base solution <code class="chem-formula">NH3</code>.',
+                subsec_base_insoluble_title: "2. Insoluble Bases",
+                base_insoluble_desc: "Bases of the remaining metals. Most are precipitates:",
+                mgoh2_name: "Magnesium hydroxide",
+                aloh3_name: "Aluminum hydroxide",
+                znoh2_name: "Zinc hydroxide",
+                cuoh2_name: "Copper(II) hydroxide",
+                feoh2_name: "Iron(II) hydroxide",
+                feoh3_name: "Iron(III) hydroxide",
+                ppt_white: "White precipitate.",
+                ppt_white_gel: "White gelatinous precipitate.",
+                ppt_blue: "Blue precipitate.",
+                ppt_greenish_white: "Greenish-white precipitate (turns reddish-brown).",
+                ppt_reddish_brown: "Reddish-brown precipitate.",
+                important_note: "Important Note:",
+                amphoteric_note: '<code class="chem-formula">Al(OH)3</code> and <code class="chem-formula">Zn(OH)2</code> are <strong class="font-semibold">amphoteric</strong> hydroxides (soluble in both strong acids and strong alkalis).',
+                sec_salt_title: "PART 2: SALTS",
+                rule1_title: "Rule 1: ALWAYS SOLUBLE Salt Groups",
+                rule1_desc: "All salts belonging to the following groups are soluble:",
+                rule1_item1: 'Alkali metal salts (<code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Sodium" target="_blank" rel="noopener noreferrer" class="wiki-link">Na+</a></code>, <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Potassium" target="_blank" rel="noopener noreferrer" class="wiki-link">K+</a></code>, <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Lithium" target="_blank" rel="noopener noreferrer" class="wiki-link">Li+</a></code>)',
+                rule1_item2: '<a href="https://en.wikipedia.org/wiki/Ammonium" target="_blank" rel="noopener noreferrer" class="wiki-link">Ammonium</a> salts (<code class="chem-formula">NH4+</code>)',
+                rule1_item3: '<a href="https://en.wikipedia.org/wiki/Nitrate" target="_blank" rel="noopener noreferrer" class="wiki-link">Nitrate</a> salts (<code class="chem-formula">NO3-</code>)',
+                rule1_item4: '<a href="https://en.wikipedia.org/wiki/Acetate" target="_blank" rel="noopener noreferrer" class="wiki-link">Acetate</a> salts (<code class="chem-formula">CH3COO-</code>) (except <code class="chem-formula">AgCH3COO</code> which is sparingly soluble)',
+                rule2_title: "Rule 2: Chloride (Cl-), Bromide (Br-), Iodide (I-) Salts",
+                mostly_soluble: "Most are soluble.",
+                exception_ppt: "Exceptions (Precipitate):",
+                agcl_name: "Silver chloride",
+                pbcl2_name: "Lead(II) chloride",
+                pbcl2_note: "White precipitate (slightly soluble in hot water).",
+                agbr_name: "Silver bromide",
+                ppt_pale_yellow: "Pale yellow precipitate.",
+                agi_name: "Silver iodide",
+                ppt_yellow: "Deep yellow precipitate.",
+                pbi2_name: "Lead(II) iodide",
+                ppt_yellow_bold: "Yellow precipitate.",
+                rule3_title: "Rule 3: Sulfate (SO4<sup>2-</sup>) Salts",
+                baso4_name: "Barium sulfate",
+                baso4_note: "White precipitate (very stable, insoluble in acids).",
+                pbso4_name: "Lead(II) sulfate",
+                exception_sparingly: "Exceptions (Sparingly Soluble):",
+                caso4_name: "Calcium sulfate",
+                caso4_note: "(Gypsum).",
+                ag2so4_name: "Silver sulfate",
+                rule4_title: "Rule 4: Carbonate (CO3<sup>2-</sup>), Sulfite (SO3<sup>2-</sup>), Phosphate (PO4<sup>3-</sup>) Salts",
+                mostly_insoluble: "Most are INSOLUBLE.",
+                exception_soluble: "Exceptions (Soluble):",
+                rule4_exception_detail: 'Salts of <code class="chem-formula">Na+</code>, <code class="chem-formula">K+</code>, <code class="chem-formula">NH4+</code>.',
+                insoluble_examples: 'Insoluble examples:',
+                rule5_title: "Rule 5: Sulfide (S<sup>2-</sup>) Salts",
+                rule5_exception_detail: 'Salts of <code class="chem-formula">Na+</code>, <code class="chem-formula">K+</code>, <code class="chem-formula">NH4+</code>.',
+                sulfide_ppt_examples: 'Some common <code class="chem-formula">S<sup>2-</sup></code> precipitates:',
+                black_sulfides: '<code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Copper(II)_sulfide" target="_blank" rel="noopener noreferrer" class="wiki-link">CuS</a></code>, <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Lead(II)_sulfide" target="_blank" rel="noopener noreferrer" class="wiki-link">PbS</a></code>, <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Silver_sulfide" target="_blank" rel="noopener noreferrer" class="wiki-link">Ag2S</a></code>, <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Iron(II)_sulfide" target="_blank" rel="noopener noreferrer" class="wiki-link">FeS</a></code> - <span class="text-gray-900 font-semibold" data-lang-key="ppt_black">Black precipitate.</span>',
+                 white_sulfide: '<code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Zinc_sulfide" target="_blank" rel="noopener noreferrer" class="wiki-link">ZnS</a></code> - <span class="font-semibold" data-lang-key="ppt_white">White precipitate.</span>',
+                ppt_black: "Black precipitate.",
+                sec_precipitate_title: "PART 3: SUMMARY OF PRECIPITATES (By Color)",
+                subsec_white_ppt_title: "1. White Precipitates",
+                 white_ppt_list: `
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Silver_chloride" target="_blank" rel="noopener noreferrer" class="wiki-link">AgCl</a></code>,
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Lead(II)_chloride" target="_blank" rel="noopener noreferrer" class="wiki-link">PbCl2</a></code>,
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Barium_sulfate" target="_blank" rel="noopener noreferrer" class="wiki-link">BaSO4</a></code>,
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Calcium_sulfate" target="_blank" rel="noopener noreferrer" class="wiki-link">CaSO4</a></code> (sparingly),
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Lead(II)_sulfate" target="_blank" rel="noopener noreferrer" class="wiki-link">PbSO4</a></code>,
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Calcium_carbonate" target="_blank" rel="noopener noreferrer" class="wiki-link">CaCO3</a></code>,
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Barium_carbonate" target="_blank" rel="noopener noreferrer" class="wiki-link">BaCO3</a></code>,
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Magnesium_carbonate" target="_blank" rel="noopener noreferrer" class="wiki-link">MgCO3</a></code>,
+                    <code class="chem-formula">CaSO3</code>,
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Magnesium_hydroxide" target="_blank" rel="noopener noreferrer" class="wiki-link">Mg(OH)2</a></code>,
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Aluminum_hydroxide" target="_blank" rel="noopener noreferrer" class="wiki-link">Al(OH)3</a></code> (gelatinous),
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Zinc_hydroxide" target="_blank" rel="noopener noreferrer" class="wiki-link">Zn(OH)2</a></code>,
+                    <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Zinc_sulfide" target="_blank" rel="noopener noreferrer" class="wiki-link">ZnS</a></code>`,
+                subsec_colored_ppt_title: "2. Colored Precipitates",
+                cuoh2_color: '<span class="text-blue-700 font-semibold"><code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Copper(II)_hydroxide" target="_blank" rel="noopener noreferrer" class="wiki-link">Cu(OH)2</a></code></span> (Blue)',
+                feoh2_color: '<span class="text-green-800 font-semibold"><code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Iron(II)_hydroxide" target="_blank" rel="noopener noreferrer" class="wiki-link">Fe(OH)2</a></code></span> (Greenish-white → Reddish-brown)',
+                feoh3_color: '<span class="text-red-700 font-semibold"><code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Iron(III)_hydroxide" target="_blank" rel="noopener noreferrer" class="wiki-link">Fe(OH)3</a></code></span> (Reddish-brown)',
+                ag3po4_color: '<span class="text-yellow-700 font-semibold"><code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Silver_phosphate" target="_blank" rel="noopener noreferrer" class="wiki-link">Ag3PO4</a></code></span> (Yellow)',
+                pbi2_color: '<span class="text-yellow-800 font-semibold"><code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Lead(II)_iodide" target="_blank" rel="noopener noreferrer" class="wiki-link">PbI2</a></code></span> (Yellow)',
+                agbr_color: '<span class="text-yellow-700 font-semibold"><code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Silver_bromide" target="_blank" rel="noopener noreferrer" class="wiki-link">AgBr</a></code></span> (Pale yellow)',
+                agi_color: '<span class="text-yellow-800 font-semibold"><code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Silver_iodide" target="_blank" rel="noopener noreferrer" class="wiki-link">AgI</a></code></span> (Deep yellow)',
+                black_sulfides_color: `<span class="text-gray-900 font-semibold">
+                        <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Copper(II)_sulfide" target="_blank" rel="noopener noreferrer" class="wiki-link">CuS</a></code>,
+                        <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Lead(II)_sulfide" target="_blank" rel="noopener noreferrer" class="wiki-link">PbS</a></code>,
+                        <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Silver_sulfide" target="_blank" rel="noopener noreferrer" class="wiki-link">Ag2S</a></code>,
+                        <code class="chem-formula"><a href="https://en.wikipedia.org/wiki/Iron(II)_sulfide" target="_blank" rel="noopener noreferrer" class="wiki-link">FeS</a></code>
+                    </span> (Black)`,
+                footer_text: "Chemistry Handbook - Compiled based on original document."
+            }
+        };
+
+        let currentLang = 'vi'; // Default language
+
+        const langToggleButton = document.getElementById('lang-toggle');
+        const translatableElements = document.querySelectorAll('[data-lang-key]');
+
+        function updateTexts() {
+            const langData = translations[currentLang];
+            document.documentElement.lang = currentLang; // Update html lang attribute
+            document.title = langData.page_title; // Update page title
+
+            langToggleButton.textContent = langData.toggle_button;
+
+            translatableElements.forEach(el => {
+                const key = el.getAttribute('data-lang-key');
+                if (langData[key]) {
+                    // Use innerHTML to allow for HTML tags within translations
+                    el.innerHTML = langData[key];
+                }
+            });
+
+             // Update simple text elements without data-lang-key (fallback if needed, prefer data-lang-key)
+             document.getElementById('main-title').textContent = langData.main_title;
+             document.getElementById('sub-title').textContent = langData.sub_title;
+             document.getElementById('toc-title').textContent = langData.toc_title;
+        }
+
+
+        langToggleButton.addEventListener('click', () => {
+            currentLang = (currentLang === 'vi') ? 'en' : 'vi';
+            updateTexts();
+             // Optional: Update Wikipedia links based on language
+            // updateWikiLinks();
+        });
+
+         // Optional function to update Wikipedia links
+        function updateWikiLinks() {
+            const links = document.querySelectorAll('a.wiki-link[href*="wikipedia.org"]');
+            const wikiDomain = currentLang === 'vi' ? 'vi.wikipedia.org' : 'en.wikipedia.org';
+
+            links.forEach(link => {
+                try {
+                    const url = new URL(link.href);
+                    // Check if it's a Wikipedia link before modifying
+                    if (url.hostname.endsWith('wikipedia.org')) {
+                        url.hostname = wikiDomain;
+                        link.href = url.toString();
+                    }
+                } catch (e) {
+                    console.error("Error parsing URL: ", link.href, e);
+                }
+            });
+        }
+
+        // Initial text setup on page load
+        updateTexts();
+
+    </script>
+</body>
+</html>
+
